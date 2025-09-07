@@ -7,25 +7,25 @@ load_dotenv()
 
 # ===== הגדרות בסיסיות =====
 APP_NAME = "מערכת חתונה מאוחדת"
-VERSION = "1.0.0"
+VERSION = "2.0.0"
 
 # ===== פלטת צבעים יוקרתית =====
 COLORS = {
-    'primary': '#3d405b',      # כהה יוקרתי (כפתורים ראשיים)
-    'secondary': '#81b29a',    # ירוק עדין (אקסנטים)
-    'accent': '#f2cc8f',       # מוזהב (הדגשות חשובות)
-    'warning': '#e07a5f',      # כתום חם (התראות)
-    'background': '#f4f1de',   # בז' מינימלי (רקע)
+    'primary': '#3d405b',      # כהה יוקרתי
+    'secondary': '#81b29a',    # ירוק עדין  
+    'accent': '#f2cc8f',       # מוזהב
+    'warning': '#e07a5f',      # כתום חם
+    'background': '#f4f1de',   # בז' מינימלי
     'white': '#ffffff',
     'text_dark': '#3d405b',
-    'text_medium': '#81b29a',
+    'text_medium': '#81b29a', 
     'text_light': '#999999',
     'border': '#e0e0e0',
     'success': '#81b29a',
     'error': '#e07a5f'
 }
 
-# ===== הגדרות CSS =====
+# ===== הגדרות CSS מאוחדות =====
 def get_main_css():
     return f"""
     <style>
@@ -40,11 +40,13 @@ def get_main_css():
         --text-dark: {COLORS['text_dark']};
         --text-medium: {COLORS['text_medium']};
         --border: {COLORS['border']};
+        --success: {COLORS['success']};
+        --error: {COLORS['error']};
     }}
     
     html, body, .stApp {{
         direction: rtl !important;
-        font-family: 'Segoe UI', 'Heebo', sans-serif !important;
+        font-family: 'Segoe UI', 'Heebo', Arial, sans-serif !important;
         background-color: var(--background) !important;
         color: var(--text-dark) !important;
     }}
@@ -73,23 +75,50 @@ def get_main_css():
         box-shadow: 0 6px 20px rgba(61, 64, 91, 0.25) !important;
     }}
     
+    .stButton > button:active {{
+        transform: translateY(0px) !important;
+    }}
+    
+    /* כפתורים מיוחדים */
+    .primary-btn {{
+        background: var(--primary) !important;
+    }}
+    
+    .secondary-btn {{
+        background: var(--secondary) !important;
+    }}
+    
+    .accent-btn {{
+        background: var(--accent) !important;
+        color: var(--text-dark) !important;
+    }}
+    
+    .warning-btn {{
+        background: var(--warning) !important;
+    }}
+    
     /* שדות טקסט מעוצבים */
-    .stTextInput > div > div > input {{
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input,
+    .stSelectbox > div > div > select {{
         border: 2px solid var(--border) !important;
         border-radius: 8px !important;
         padding: 12px 16px !important;
         font-size: 14px !important;
         background: var(--white) !important;
         transition: all 0.3s ease !important;
+        font-family: inherit !important;
     }}
     
-    .stTextInput > div > div > input:focus {{
+    .stTextInput > div > div > input:focus,
+    .stNumberInput > div > div > input:focus,
+    .stSelectbox > div > div > select:focus {{
         border-color: var(--primary) !important;
         box-shadow: 0 0 0 3px rgba(61, 64, 91, 0.1) !important;
         outline: none !important;
     }}
     
-    /* כרטיסים */
+    /* כרטיסים יוקרתיים */
     .metric-card {{
         background: var(--white);
         border-radius: 16px;
@@ -98,6 +127,7 @@ def get_main_css():
         border: 1px solid var(--border);
         text-align: center;
         transition: all 0.3s ease;
+        margin-bottom: 20px;
     }}
     
     .metric-card:hover {{
@@ -110,6 +140,7 @@ def get_main_css():
         font-weight: 800;
         color: var(--primary);
         margin-bottom: 8px;
+        line-height: 1;
     }}
     
     .metric-label {{
@@ -118,24 +149,41 @@ def get_main_css():
         font-weight: 500;
     }}
     
+    /* כרטיס מידע */
+    .info-card {{
+        background: var(--white);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border-right: 4px solid var(--accent);
+        margin-bottom: 15px;
+    }}
+    
     /* אזהרות והודעות */
     .alert {{
         padding: 16px;
         border-radius: 12px;
         margin: 16px 0;
         font-weight: 500;
+        border-right: 4px solid;
     }}
     
     .alert-success {{
         background: rgba(129, 178, 154, 0.15);
-        border: 1px solid var(--secondary);
-        color: var(--secondary);
+        border-right-color: var(--success);
+        color: var(--success);
     }}
     
     .alert-warning {{
         background: rgba(224, 122, 95, 0.15);
-        border: 1px solid var(--warning);
+        border-right-color: var(--warning);
         color: var(--warning);
+    }}
+    
+    .alert-info {{
+        background: rgba(61, 64, 91, 0.1);
+        border-right-color: var(--primary);
+        color: var(--primary);
     }}
     
     /* טבלאות מעוצבות */
@@ -145,6 +193,7 @@ def get_main_css():
         overflow: hidden;
         box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         width: 100%;
+        border: 1px solid var(--border);
     }}
     
     .styled-table th {{
@@ -164,13 +213,20 @@ def get_main_css():
         background: rgba(242, 204, 143, 0.05);
     }}
     
+    /* DataFrame styling */
+    .stDataFrame {{
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+    }}
+    
     /* סייד בר מעוצב */
-    .stSidebar > div {{
+    .stSidebar > div:first-child {{
         background: var(--white) !important;
         border-left: 3px solid var(--accent) !important;
     }}
     
-    /* עיצוב לאימות */
+    /* עיצוב אימות */
     .auth-container {{
         max-width: 400px;
         margin: 100px auto;
@@ -179,6 +235,7 @@ def get_main_css():
         border-radius: 20px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         text-align: center;
+        border: 1px solid var(--border);
     }}
     
     .auth-title {{
@@ -188,23 +245,141 @@ def get_main_css():
         margin-bottom: 30px;
     }}
     
+    /* כותרות דף */
+    .page-header {{
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        color: var(--white);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 30px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    }}
+    
+    .page-title {{
+        margin: 0 0 10px 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }}
+    
+    .page-subtitle {{
+        margin: 0;
+        opacity: 0.9;
+        font-weight: normal;
+    }}
+    
+    /* בר התקדמות */
+    .progress-container {{
+        background: var(--white);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }}
+    
+    .progress-bar {{
+        background: var(--border);
+        height: 10px;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-top: 10px;
+    }}
+    
+    .progress-fill {{
+        background: linear-gradient(90deg, var(--secondary), var(--accent));
+        height: 100%;
+        border-radius: 5px;
+        transition: width 0.3s ease;
+    }}
+    
+    /* פורמים */
+    .form-section {{
+        background: var(--white);
+        padding: 25px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        border: 1px solid var(--border);
+    }}
+    
+    .form-title {{
+        color: var(--primary);
+        margin: 0 0 20px 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }}
+    
+    /* גריד */
+    .grid-container {{
+        display: grid;
+        gap: 20px;
+        margin-bottom: 20px;
+    }}
+    
+    .grid-2 {{
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }}
+    
+    .grid-3 {{
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }}
+    
+    .grid-4 {{
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }}
+    
     /* אייקונים */
     .icon {{
-        font-size: 1.5rem;
+        font-size: 1.2rem;
         margin-left: 8px;
+        vertical-align: middle;
+    }}
+    
+    /* סטטוס */
+    .status-active {{
+        color: var(--success);
+        font-weight: 600;
+    }}
+    
+    .status-inactive {{
+        color: var(--text-light);
+        font-weight: 600;
+    }}
+    
+    .status-warning {{
+        color: var(--warning);
+        font-weight: 600;
+    }}
+    
+    /* Expander מותאם */
+    .streamlit-expanderHeader {{
+        background: var(--background) !important;
+        border-radius: 8px !important;
+        border: 1px solid var(--border) !important;
     }}
     
     /* רספונסיבי */
     @media (max-width: 768px) {{
         .metric-card {{
             padding: 16px;
+            margin-bottom: 15px;
         }}
+        
         .metric-value {{
             font-size: 2rem;
         }}
+        
         .auth-container {{
             margin: 50px 20px;
             padding: 30px 20px;
+        }}
+        
+        .page-title {{
+            font-size: 2rem;
+        }}
+        
+        .grid-2, .grid-3, .grid-4 {{
+            grid-template-columns: 1fr;
         }}
     }}
     </style>
@@ -223,10 +398,10 @@ WEBHOOK_SHARED_SECRET = os.getenv("WEBHOOK_SHARED_SECRET")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # ===== הגדרות מערכת =====
-DEFAULT_CURRENCY = os.getenv("DEFAULT_CURRENCY", "ILS")
-DEFAULT_TIMEZONE = os.getenv("DEFAULT_TIMEZONE", "Asia/Jerusalem")
+DEFAULT_CURRENCY = "ILS"
+DEFAULT_TIMEZONE = "Asia/Jerusalem"
 
-# טלפונים מורשים - חשוב מאוד!
+# טלפונים מורשים - לאדמין בלבד
 ALLOWED_PHONES_STR = os.getenv("ALLOWED_PHONES", "")
 ALLOWED_PHONES = set(phone.strip() for phone in ALLOWED_PHONES_STR.split(",") if phone.strip()) if ALLOWED_PHONES_STR else set()
 
@@ -257,12 +432,12 @@ AI_SETTINGS = {
 }
 
 # ===== מבנה Google Sheets =====
-# גיליון ראשי - זוגות
+# גיליון זוגות
 COUPLES_HEADERS = [
     "group_id",           # WhatsApp Group ID
-    "phone1",            # טלפון חתן
-    "phone2",            # טלפון כלה  
-    "couple_name",       # שם הזוג (אופציונלי)
+    "phone1",            # טלפון ראשון
+    "phone2",            # טלפון שני  
+    "couple_name",       # שם הזוג
     "wedding_date",      # תאריך חתונה
     "budget",           # תקציב
     "created_at",       # תאריך יצירה
@@ -355,6 +530,39 @@ MAX_FILE_SIZE_MB = 10
 ALLOWED_IMAGE_TYPES = ['.jpg', '.jpeg', '.png', '.webp']
 AUTH_TOKEN_EXPIRE_MINUTES = 120  # 2 שעות
 
+# ===== פורמט טלפונים =====
+def normalize_phone(phone: str) -> str:
+    """נרמול מספר טלפון לפורמט אחיד"""
+    if not phone:
+        return ""
+    
+    # ניקוי תווים לא רלוונטיים
+    clean = ''.join(filter(str.isdigit, str(phone)))
+    
+    # המרה מפורמט בינלאומי לישראלי
+    if clean.startswith('972'):
+        clean = '0' + clean[3:]
+    
+    # הוספת 0 בתחילת אם חסר
+    if len(clean) == 9 and clean.startswith('5'):
+        clean = '0' + clean
+    
+    return clean
+
+def format_phone_display(phone: str) -> str:
+    """פורמט טלפון לתצוגה"""
+    clean = normalize_phone(phone)
+    
+    if len(clean) == 10 and clean.startswith('05'):
+        return f"{clean[:3]}-{clean[3:6]}-{clean[6:]}"
+    
+    return phone
+
+def is_valid_phone(phone: str) -> bool:
+    """בדיקת תקינות מספר טלפון"""
+    clean = normalize_phone(phone)
+    return len(clean) == 10 and clean.startswith('05')
+
 # ===== פונקציות עזר =====
 def validate_config() -> Dict[str, bool]:
     """בדיקת תקינות הגדרות"""
@@ -363,24 +571,39 @@ def validate_config() -> Dict[str, bool]:
         "whatsapp": bool(GREENAPI_INSTANCE_ID and GREENAPI_TOKEN),
         "openai": bool(OPENAI_API_KEY),
         "webhook_secret": bool(WEBHOOK_SHARED_SECRET),
-        "allowed_phones": bool(ALLOWED_PHONES)
+        "admin_phones": bool(ALLOWED_PHONES),
+        "admin_password": bool(ADMIN_PASSWORD)
     }
 
-def is_phone_allowed(phone: str) -> bool:
-    """בדיקה האם הטלפון מורשה"""
+def is_admin_phone(phone: str) -> bool:
+    """בדיקה האם הטלפון של אדמין"""
     if not ALLOWED_PHONES:
         return False
     
-    # נקה את המספר
-    clean_phone = ''.join(filter(str.isdigit, phone))
+    clean_phone = normalize_phone(phone)
     
-    # בדוק מול כל המספרים המורשים
     for allowed in ALLOWED_PHONES:
-        clean_allowed = ''.join(filter(str.isdigit, allowed))
-        if clean_phone == clean_allowed or clean_phone.endswith(clean_allowed[-8:]):
+        clean_allowed = normalize_phone(allowed)
+        if clean_phone == clean_allowed:
             return True
     
     return False
+
+# ===== הגדרות URL =====
+# יש להחליף בהגדרות הפריסה
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8501")
+
+def get_dashboard_url(group_id: str, token: str) -> str:
+    """יצירת קישור לדשבורד"""
+    return f"{BASE_URL}/?page=dashboard&group_id={group_id}&token={token}"
+
+def get_contacts_merge_url(group_id: str, token: str) -> str:
+    """יצירת קישור לחיבור אנשי קשר"""
+    return f"{BASE_URL}/?page=contacts&group_id={group_id}&token={token}"
+
+def get_admin_url() -> str:
+    """יצירת קישור לדשבורד אדמין"""
+    return f"{BASE_URL}/?page=admin"
 
 if __name__ == "__main__":
     # בדיקה מהירה של הקונפיגורציה
@@ -390,6 +613,15 @@ if __name__ == "__main__":
         emoji = "✅" if status else "❌"
         print(f"{emoji} {service}")
     
-    print(f"\n📱 טלפונים מורשים: {len(ALLOWED_PHONES)}")
+    print(f"\n📱 טלפוני אדמין: {len(ALLOWED_PHONES)}")
     print(f"🎨 צבעים: {len(COLORS)}")
     print(f"📋 קטגוריות: {len(CATEGORY_LIST)}")
+    
+    # בדיקת פורמט טלפונים
+    test_phones = ["0507676706", "+972507676706", "507676706"]
+    print(f"\n📞 בדיקת פורמט טלפונים:")
+    for phone in test_phones:
+        normalized = normalize_phone(phone)
+        formatted = format_phone_display(phone)
+        valid = is_valid_phone(phone)
+        print(f"  {phone} → {normalized} → {formatted} (תקין: {valid})")

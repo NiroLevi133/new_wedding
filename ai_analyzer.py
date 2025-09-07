@@ -425,7 +425,7 @@ def get_ai_analyzer() -> AIAnalyzer:
 # ===== בדיקה =====
 if __name__ == "__main__":
     print("🧪 Testing AI Analyzer...")
-    
+
     try:
         ai = AIAnalyzer()
         
@@ -447,41 +447,45 @@ if __name__ == "__main__":
         print(f"📈 AI Statistics: {stats}")
         
         print("✅ AI Analyzer test completed")
-        
+
     except Exception as e:
         print(f"❌ AI test failed: {e}")
- "system", "content": system_prompt},
-                    {"role": "user", "content": [
-                        {"type": "text", "text": user_prompt},
-                        {"type": "image_url", "image_url": {
-                            "url": f"data:image/jpeg;base64,{b64_image}",
-                            "detail": "high"
-                        }}
-                    ]}
-                ],
-                temperature=AI_SETTINGS["temperature"],
-                max_tokens=AI_SETTINGS["max_tokens"]
-            )
-            
-            # עיבוד התשובה
-            content = response.choices[0].message.content.strip()
-            receipt_data = self._parse_ai_response(content)
-            
-            # ניקוי ואימות הנתונים
-            receipt_data = self._clean_and_validate_receipt(receipt_data)
-            
-            # הוספת מידע נוסף
-            receipt_data['analyzed_at'] = datetime.now().isoformat()
-            receipt_data['source'] = 'image_analysis'
-            if group_id:
-                receipt_data['group_id'] = group_id
-            
-            logger.info(f"✅ Successfully analyzed receipt: {receipt_data.get('vendor', 'Unknown')}")
-            return receipt_data
-            
-        except Exception as e:
-            logger.error(f"❌ Receipt analysis failed: {e}")
-            return self._create_fallback_receipt()
+
+
+    # שימוש ב־OpenAI API עם תמונה + טקסט
+    response = client.chat.completions.create(
+        model=AI_SETTINGS["model"],
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": [
+                {"type": "text", "text": user_prompt},
+                {"type": "image_url", "image_url": {
+                    "url": f"data:image/jpeg;base64,{b64_image}",
+                    "detail": "high"
+                }}
+            ]}
+        ],
+        temperature=AI_SETTINGS["temperature"],
+        max_tokens=AI_SETTINGS["max_tokens"]
+    )
+
+    # עיבוד התשובה
+    content = response.choices[0].message.content.strip()
+    receipt_data = self._parse_ai_response(content)
+
+    # ניקוי ואימות הנתונים
+    receipt_data = self._clean_and_validate_receipt(receipt_data)
+
+    # הוספת מידע נוסף
+    receipt_data['analyzed_at'] = datetime.now().isoformat()
+    receipt_data['source'] = 'image_analysis'
+    if group_id:
+        receipt_data['group_id'] = group_id
+
+    logger.info(f"✅ Successfully analyzed receipt: {receipt_data.get('vendor', 'Unknown')}")
+    return receipt_data
+
+        
     
     def _get_receipt_analysis_prompt(self) -> str:
         """יוצר פרומפט מפורט לניתוח קבלות"""
@@ -748,11 +752,11 @@ JSON נדרש:
             user_prompt = f'נתח את ההודעה הזו לזיהוי הוצאה: "{message}"'
             
             response = self.client.chat.completions.create(
-                model=AI_SETTINGS["model"],
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                temperature=0.1,
-                max_tokens=300
-            )
+            model=AI_SETTINGS["model"],
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.1,
+            max_tokens=300
+        )
